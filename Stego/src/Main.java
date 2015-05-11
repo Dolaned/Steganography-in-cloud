@@ -7,11 +7,11 @@ public class Main {
 	private static String keyName        = "*** Provide key ***";
 	public static AmazonHandler aHandler = new AmazonHandler();
 	public static Steganography steg = new Steganography();
-
+	public static Scanner sc = new Scanner(System.in);
 	public static void main(String args[]) {
 
 		String menuInput = "";
-		Scanner sc = new Scanner(System.in);
+		
 		
 		while(!menuInput.contains("X")){
 			
@@ -33,8 +33,9 @@ public class Main {
 				break;
 			}
 		}
-
 		
+
+		sc.close();
 
 	}
 	
@@ -55,10 +56,15 @@ public class Main {
 		File folder = new File(folderName);
 		File privateDataFile = new File(privateData);
 		
+		// set file paths.
 		steg.setFolderPath(folder);
 		steg.setPrivateFile(privateDataFile);
 		
-		steg.wavelets(steg.getFolderPath());
+		//call secret data encryption method.
+		//if(steg.encrypt(privateDataFile)){
+			steg.stegStart(steg.getFolderPath(),steg.getPrivateDataFile());
+		//}
+		
 		
 		
 		//if(aHandler.pushToCloud(bucketName, keyName, null)){
