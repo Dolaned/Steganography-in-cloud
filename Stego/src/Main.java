@@ -36,6 +36,9 @@ public class Main {
 					case "2":
 						pullFromCloud();
 					break;
+					case "3":
+						checkPrd();
+						break;
 					default:
 						System.out.println("Enter Valid Input!");
 				}
@@ -55,6 +58,15 @@ public class Main {
 	}
 	
 	
+	private static void checkPrd() {
+		// TODO Auto-generated method stub
+		if(steg.getPrivateDataFile() != null){
+			
+		}
+		
+	}
+
+
 	private static void pushToCloud() throws IOException{
 		
 		String folderName;
@@ -101,6 +113,7 @@ public class Main {
 		System.out.println("Please Choose From The Follow Options:");
 		System.out.println("1. Input, Encrypt File And Push To Cloud.");
 		System.out.println("2. Pull From Cloud And Decrypt.");
+		System.out.println("3. Check prd of the stego file against original data");
 		System.out.println("X. Exit");
 		System.out.println("\n");
 		System.out.println("Please Enter An Option: ");
