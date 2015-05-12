@@ -19,7 +19,8 @@ public class Steganography
    private static ArrayList<String> dataSetFileList = new ArrayList<String>();
    private Path currentRelativePath = Paths.get("");
    private String appWorkingFolder = currentRelativePath.toAbsolutePath().toString();
-   
+   final String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+   final int alphLength = alphabet.length();
    
    public boolean encrypt(File file)
    {
@@ -33,7 +34,7 @@ public class Steganography
          new Random().nextBytes(secretkey);
          
          pw.write(toBinaryString(secretkey));
-         
+         pw.close();
          cipher = new byte[fileData.length];
          
          for(byte b : fileData)
@@ -130,6 +131,60 @@ public class Steganography
    
    public boolean hideData(double[][] tList){
 	   int s = 1;
+	   char[] key = new char[tList.length];
+	   Random r = new Random();
+	   pw = new PrintWriter(new BufferedWriter(new FileWriter(appWorkingFolder + "matrixkey.txt")));
+	   
+	   //generate random key
+	   for(int i = 0; i < tList.length; i++)
+	   {
+	      key[i] = alphabet.charAt(r.nextInt(alphLength));
+	   }
+	   
+	   //desc order
+	   char[] keyCopy = Arrays.copyOf(key, key.length);
+	   char[] keyDesc = new char[key.length];
+	   int count = 0;
+	   for(int i = key.length-1; i >= 0; i--)
+	   {
+	      keyDesc[count] = keyCopy[i];
+	      count++;
+	   }
+	   
+	   int[] col = new int[key.length];
+	   for(int i = 0; i < key.length; i++)
+	   {
+	      for(int j = 0; j < key.length; j++)
+	      {
+	         if(keyDesc[i] == key[j])
+	            col[j] = i;
+	      }
+	   }
+	   
+	   //asc order
+	   char[] keyAsc = Arrays.copyOf(key, key.length);
+	   Arrays.sort(keyAsc);
+	   
+	   int[] row = new int[key.length];
+      for(int i = 0; i < key.length; i++)
+      {
+         for(int j = 0; j < key.length; j++)
+         {
+            if(keyAsc[i] == key[j])
+               row[j] = i;
+         }
+      }
+	   // row[] and col[] as the position matrix for the hiding position
+      
+      //write matrix to file
+      for(int i = 0; i < col.length; i++)
+         pw.print(col[i]);
+      
+      pw.println();
+      for(int i = 0; i < row.length; i++)
+         pw.print(row[i]);
+      pw.close();
+      
 	   while(s < tList.length){
 		   
 	   }
