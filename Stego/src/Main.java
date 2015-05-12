@@ -8,35 +8,50 @@ public class Main {
 	public static AmazonHandler aHandler = new AmazonHandler();
 	public static Steganography steg = new Steganography();
 	public static Scanner sc = new Scanner(System.in);
+	
 	public static void main(String args[]) {
+		
+		//scanner for menu input
 
-		String menuInput = "";
+		// string menu input
+		String menuInput = new String();
 		
 		
 		while(!menuInput.contains("X")){
-			
+			//print menu and pull scanner input
 			printMenu();
 			menuInput = sc.nextLine().toUpperCase();
 			
-			switch(menuInput){
-			
-				case "1":
-				try {
-					pushToCloud();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			if(menuInput.length() == 1 && !menuInput.contains("X")){
+				switch(menuInput){
+				
+					case "1":
+					try {
+						pushToCloud();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+					case "2":
+						pullFromCloud();
+					break;
+					default:
+						System.out.println("Enter Valid Input!");
 				}
-				break;
-				case "2":
-					pullFromCloud();
-				break;
+			}else{
+				// if the above if statement is not run and input does not
+				// contain
+				// and Upper-case X then print and error.
+				if (!menuInput.contains("X")) {
+					System.out.println("Enter a valid input");
+				}else{
+					//Where i will write to the file as the program Exits.
+					System.out.println("Program closed");
+				}
+				
 			}
 		}
-		
-
-		sc.close();
-
 	}
 	
 	
@@ -44,7 +59,6 @@ public class Main {
 		
 		String folderName;
 		String privateData;
-		Scanner sc = new Scanner(System.in);
 		
 		//input file path folder.
 		System.out.println("Input the FULL File Path: ");
@@ -71,7 +85,6 @@ public class Main {
 			//System.out.println("File Uploaded");
 		//}
 		
-		sc.close();
 	}
 	
 	private static boolean pullFromCloud(){

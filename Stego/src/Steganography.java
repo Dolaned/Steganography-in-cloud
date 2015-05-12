@@ -71,7 +71,7 @@ public class Steganography
        }
        
        //create the two dimensional wavelet array.
-       double[][] transformedList = Wavelets.transform(5, waveletList);
+       double[][] transformedList = Wavelets.transform(4, waveletList);
        for(int i = 0; i < transformedList.length; i++){
      	    for (int k = 0; k < transformedList[i].length; k++) {
      	    	//adjust coef
@@ -129,7 +129,7 @@ public class Steganography
 	    return bytes;
 	}
    
-   public boolean hideData(double[][] tList){
+   public boolean hideData(double[][] tList) throws IOException{
 	   int s = 1;
 	   char[] key = new char[tList.length];
 	   Random r = new Random();
