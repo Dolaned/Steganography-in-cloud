@@ -1,9 +1,18 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Scanner;
 
 import org.mathIT.approximation.Wavelets;
 
@@ -16,7 +25,7 @@ public class Steganography
    private PrintWriter pw;
    private File folderPath;
    private File pDataFile;
-   private static ArrayList<String> dataSetFileList = new ArrayList<String>();
+   private static ArrayList<Double> dataSetFileList = new ArrayList<Double>();
    private Path currentRelativePath = Paths.get("");
    private String appWorkingFolder = currentRelativePath.toAbsolutePath().toString();
    final String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -67,11 +76,11 @@ public class Steganography
        
        //loop through the wavelet array and list.
        for(int j = 0; j < dataSetFileList.size(); j++){
-     	  waveletList[j] = Double.parseDouble(dataSetFileList.get(j));
+     	  waveletList[j] = dataSetFileList.get(j);
        }
        
        //create the two dimensional wavelet array.
-       double[][] transformedList = Wavelets.transform(4, waveletList);
+       double[][] transformedList = Wavelets.transform(2, waveletList);
        for(int i = 0; i < transformedList.length; i++){
      	    for (int k = 0; k < transformedList[i].length; k++) {
      	    	//adjust coef
@@ -90,34 +99,35 @@ public class Steganography
    // loop all files in folder and apply wavelets
    public void stegStart(File folder, File pData) throws IOException
    {
-	  //get path relative to where app was started.
-
+	  //Get relative path
+	  
 	  String appendedFile = appWorkingFolder + "data.txt";
 	  
-	  //get all files from the passed in folder.
+	  // Existence checking to avoid appending
+	  File existenceCheck = new File(appendedFile);
+	  if(existenceCheck.exists())
+	  {
+		  existenceCheck.delete();  
+	  }
+	  
+	  //Get all files from the passed in folder.
       File[] filesInFolder = folder.listFiles();
+      File stegoOriginal = new File(appendedFile);
       
-      //join all the files into one file.
-      IOCopier.joinFiles(new File(appendedFile), filesInFolder);
+      //Join all the files into one file.
+      IOCopier.joinFiles(stegoOriginal, filesInFolder);
       
-      //print file name and directory to screen.
-      System.out.println("Appended file is:  \n" + appendedFile);
+      //Print file name and directory to screen.
+      System.out.println("Appended file is:  \n" + stegoOriginal.getName());
       
-      //grab full text data file
-      File bigData = new File(appendedFile);
-      
-      if(readFileContents(bigData)){
-    	  steganography(bigData, cipher);
-          
-          
-      }else{
+      //Grab full text data file
+      if(readFileContents(stegoOriginal))
+      {
+    	  steganography(stegoOriginal, cipher);   
+      }else
+      {
     	  System.out.println("File not read please try again.");
       }
-      
-      
-
-    	
-      
    }
    
    public static byte[] toByteArray(double[] doubleArray){
@@ -196,10 +206,17 @@ public class Steganography
 	   try{
 		   Scanner fileReader = new Scanner(data);
 		   
-		   fileReader.useDelimiter("\n|\t|,");
-		   while(fileReader.hasNext()){
-			   dataSetFileList.add(fileReader.next());
+		  // fileReader.useDelimiter("\n|\t|,");
+		   while(fileReader.hasNextLine()){
+			   dataSetFileList.add(Double.parseDouble(fileReader.nextLine()));
 		   }
+		   int count = 0;
+		   for(int i=0; i<dataSetFileList.size(); i++)
+		   {
+			   System.out.println("Value: " + dataSetFileList.get(i));
+			   count++;
+		   }
+		   System.out.println("Count is: " + count);
 		   fileReader.close();
 		   return true;
 	   }catch(FileNotFoundException e){
