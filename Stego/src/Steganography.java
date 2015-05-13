@@ -69,26 +69,30 @@ public class Steganography
        return sb.toString();
    }
    
-   public void steganography(File bigData, byte[] key){
+   public void steganography(byte[] key) throws IOException{
        
  	  //once file is read convert the arraylist into an Array for the wavelet transform function.
-       double[] waveletList = new double[dataSetFileList.size()];
-       
+       double[] waveletInputArray = new double[dataSetFileList.size()];
+
        //loop through the wavelet array and list.
        for(int j = 0; j < dataSetFileList.size(); j++){
-     	  waveletList[j] = dataSetFileList.get(j);
+    	   waveletInputArray[j] = dataSetFileList.get(j);
        }
-       
+       File output = new File(appWorkingFolder + "waveletdata.txt");
+       FileWriter fileWriter = new FileWriter(output);
+       PrintWriter writer = new PrintWriter(fileWriter);
        //create the two dimensional wavelet array.
-       double[][] transformedList = Wavelets.transform(2, waveletList);
+       double[][] transformedList = Wavelets.transform(2, waveletInputArray);
        for(int i = 0; i < transformedList.length; i++){
      	    for (int k = 0; k < transformedList[i].length; k++) {
      	    	//adjust coef
-     	        transformedList[i][k]+=20;
-     	        transformedList[i][k]*=10000;
-     	        
+     	        //transformedList[i][k]+=20;
+     	        //transformedList[i][k]*=10000;
+     	        System.out.format("[%d][%d] is: %f\n",i,k,transformedList[i][k]);
+     	        writer.format("[%d][%d] is: %f\n",i,k,transformedList[i][k]);
      	    }
        }
+       writer.close();
        //call the hiding method
      //toByteArray(transformedList);
      //hideData(transformedList);  
@@ -123,7 +127,7 @@ public class Steganography
       //Grab full text data file
       if(readFileContents(stegoOriginal))
       {
-    	  steganography(stegoOriginal, cipher);   
+    	  steganography(cipher);   
       }else
       {
     	  System.out.println("File not read please try again.");
@@ -203,24 +207,19 @@ public class Steganography
    }
    public boolean readFileContents(File data) throws IOException {
 	   //init Variables.
-	   try{
-		   Scanner fileReader = new Scanner(data);
-		   
-		  // fileReader.useDelimiter("\n|\t|,");
-		   while(fileReader.hasNextLine()){
-			   dataSetFileList.add(Double.parseDouble(fileReader.nextLine()));
-		   }
-		   int count = 0;
-		   for(int i=0; i<dataSetFileList.size(); i++)
-		   {
-			   System.out.println("Value: " + dataSetFileList.get(i));
-			   count++;
-		   }
-		   System.out.println("Count is: " + count);
-		   fileReader.close();
-		   return true;
-	   }catch(FileNotFoundException e){
-
+	   try
+	   {
+			Scanner fileReader = new Scanner(data);		   
+			// fileReader.useDelimiter("\n|\t|,");
+			while(fileReader.hasNextLine())
+			{
+				dataSetFileList.add(Double.parseDouble(fileReader.nextLine()));
+			}
+			fileReader.close();
+			return true;
+	   }
+	   catch(FileNotFoundException e)
+	   {
 	         System.out.println("Data file not found!");
 	         return false;
 	   }
