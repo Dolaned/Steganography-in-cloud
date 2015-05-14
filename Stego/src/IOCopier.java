@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 
 public class IOCopier {
-    public static void joinFiles(File destination, File[] sources)
+	public static void joinFiles(File destination, File[] sources)
             throws IOException {
         OutputStream output = null;
         try {
