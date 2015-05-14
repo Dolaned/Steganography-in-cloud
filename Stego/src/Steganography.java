@@ -18,15 +18,13 @@ import java.util.Scanner;
 import org.mathIT.approximation.Wavelets;
 
 public class Steganography {
-	private static ArrayList<String> pInfo = new ArrayList<String>();
 	private static byte[] cipher;
-	private static BufferedReader fr;
 	private PrintWriter pw;
 	private File folderPath;
 	private File pDataFile;
 	private static ArrayList<Double> dataSetFileList = new ArrayList<Double>();
-	private Path currentRelativePath = Paths.get("");
-	private String appWorkingFolder = currentRelativePath.toAbsolutePath()
+	private static Path currentRelativePath = Paths.get("");
+	private static String appWorkingFolder = currentRelativePath.toAbsolutePath()
 			.toString();
 	final String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	final int alphLength = alphabet.length();
@@ -88,6 +86,7 @@ public class Steganography {
 		List<List<Double>> stegoList = new ArrayList<List<Double>>();
 		int firstDimensionCounter = 0;
 		int treeCounter = 0;
+		double stegoTree[][] = null;
 
 		for (int i = 0; i < transformedList.length; i++) {
 			for (int k = 0; k < transformedList[i].length; k++) {
@@ -243,5 +242,8 @@ public class Steganography {
 
 	public File getPrivateDataFile() {
 		return pDataFile;
+	}
+	public static String getAppFolder(){
+		return appWorkingFolder;
 	}
 }

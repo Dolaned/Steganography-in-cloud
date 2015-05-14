@@ -1,5 +1,7 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -36,7 +38,7 @@ public class Main {
 					pullFromCloud();
 					break;
 				case "3":
-					checkPrd();
+					checkPrd(Steganography.getAppFolder());
 					break;
 				default:
 					System.out.println("Enter Valid Input!");
@@ -56,12 +58,69 @@ public class Main {
 		}
 	}
 
-	private static void checkPrd() {
-		// TODO Auto-generated method stub
-		if (steg.getPrivateDataFile() != null) {
-
+	private static void checkPrd(String dir) {
+		
+		//pass in the folder working directory and creat files from the original and stego data.
+		File stegData = new File(dir + "stegodata.txt");
+		File orignalData = new File(dir + "originaldata.txt");
+		//create two array lists for the data.
+		ArrayList<Double> stegDataList = new ArrayList<Double>(); 
+		ArrayList<Double> origDataList = new ArrayList<Double>();
+		
+		//check if the files exist.
+		if (stegData.exists() && orignalData.exists()) {
+			try {
+				//Read stegodata to array list
+				Scanner stegoFileReader = new Scanner(stegData);
+				// fileReader.useDelimiter("\n|\t|,");
+				while (stegoFileReader.hasNextLine()) {
+					stegDataList.add(Double.parseDouble(stegoFileReader.nextLine()));
+				}
+				stegoFileReader.close();
+				
+				//Read orignalData to array list.
+				Scanner orginalFileReader = new Scanner(orignalData);
+				while (orginalFileReader.hasNextLine()) {
+					origDataList.add(Double.parseDouble(orginalFileReader.nextLine()));
+				}
+				orginalFileReader.close();
+				
+				//call the actual prd  function
+				calculatePrd(stegDataList, origDataList);
+				
+				
+			} catch (FileNotFoundException e) {
+				System.out.println("Data file not found!");
+			}
+		}else{
+			if(!stegData.exists()){
+				System.out.println("Stego Data File Not Found!");
+			}else if(!orignalData.exists()){
+				System.out.println("Original Data File Not Found!");
+			}else{
+				System.out.println("Some Other Error Occured Or You Must Run Option 1 or 2 First!!");
+			}
 		}
 
+	}
+
+	private static void calculatePrd(ArrayList<Double> stegDataList, ArrayList<Double> origDataList) {
+		
+		double m=0;
+		double u=0;
+		double x;
+		
+		//Loop through the size of the double array list, the two of them should be the same length.
+		for (int i=0 ; i < stegDataList.size(); i++)
+		{
+			m += Math.pow(stegDataList.get(i) - origDataList.get(i), 2);
+			u += Math.pow(stegDataList.get(i), 2);
+			
+		}
+		
+		x = (Math.pow(m / u, 0.5) *100);
+		System.out.println(x);
+		
 	}
 
 	private static void pushToCloud() throws IOException {
