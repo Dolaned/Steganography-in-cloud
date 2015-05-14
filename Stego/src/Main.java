@@ -38,7 +38,12 @@ public class Main {
 					pullFromCloud();
 					break;
 				case "3":
-					checkPrd(Steganography.getAppFolder());
+					try {
+						checkPrd(Steganography.getAppFolder());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					break;
 				default:
 					System.out.println("Enter Valid Input!");
@@ -58,11 +63,11 @@ public class Main {
 		}
 	}
 
-	private static void checkPrd(String dir) {
+	private static void checkPrd(String dir) throws IOException {
 		
 		//pass in the folder working directory and creat files from the original and stego data.
-		File stegData = new File(dir + "stegodata.txt");
-		File orignalData = new File(dir + "originaldata.txt");
+		File stegData = new File(dir + "/stegodata.txt");
+		File orignalData = new File(dir + "/originaldata.txt");
 		//create two array lists for the data.
 		ArrayList<Double> stegDataList = new ArrayList<Double>(); 
 		ArrayList<Double> origDataList = new ArrayList<Double>();
@@ -114,12 +119,12 @@ public class Main {
 		for (int i=0 ; i < stegDataList.size(); i++)
 		{
 			m += Math.pow(stegDataList.get(i) - origDataList.get(i), 2);
-			u += Math.pow(stegDataList.get(i), 2);
 			
+			u += Math.pow(stegDataList.get(i), 2);
 		}
 		
 		x = (Math.pow(m / u, 0.5) *100);
-		System.out.println(x);
+		System.out.println("The Distortion is: "+ x +" %\n");
 		
 	}
 

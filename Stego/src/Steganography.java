@@ -117,7 +117,7 @@ public class Steganography {
 	public void stegStart(File folder, File pData) throws IOException {
 		// Get relative path
 
-		String appendedFile = appWorkingFolder + "data.txt";
+		String appendedFile = appWorkingFolder + "/originaldata.txt";
 
 		// Existence checking to avoid appending
 		File existenceCheck = new File(appendedFile);
