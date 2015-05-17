@@ -64,21 +64,21 @@ public class Steganography {
 
 	public void steganography(byte[] key) throws IOException {
 
-		// once file is read convert the arraylist into an Array for the wavelet
+		// Once file is read convert the arraylist into an Array for the wavelet
 		// transform function.
 		double[] waveletInputArray = new double[dataSetFileList.size()];
 		int levelSize = 0, levelCounter =0, indexCounter = 0;
-		// loop through the wavelet array and list.
+		
+		// Loop through the wavelet array and list.
 		for (int j = 0; j < dataSetFileList.size(); j++) {
 			waveletInputArray[j] = dataSetFileList.get(j);
 			
 		}
 		
 		File output = new File(appWorkingFolder + "waveletdata.txt");
-		
 		FileWriter fileWriter = new FileWriter(output);
 		PrintWriter writer = new PrintWriter(fileWriter);
-		// create the two dimensional wavelet array.
+		// Create the two dimensional wavelet array.
 		double[][] transformedList = Wavelets.transform(4, waveletInputArray);
 		double[] inversedList = Wavelets.inverseTransform(4, transformedList);
 		
@@ -86,10 +86,9 @@ public class Steganography {
 		for (int i = 0; i < transformedList.length; i++) {
 			for (int k = 0; k < transformedList[i].length; k++) {
 				
-				// Iterate number of levels
+				// Iterate number of levels (512 per level)
 				levelCounter++;
-				
-				// Iterate number of indices
+				// Iterate number of indices (total indices in the tree)
 				indexCounter++;
 				if(levelCounter == 512)
 				{
@@ -97,13 +96,18 @@ public class Steganography {
 					levelCounter = 0;
 				}
 				
-				// adjust coef
+				// TODO: Adjust coefficients 
+				
 				// transformedList[i][k]+=20;
 				// transformedList[i][k]*=10000;
 			}
 		}
+		
+		// Create wavelet to emulate the tree based on level size and values per level
 		double[][] splitWavelet = new double[levelSize][512];
+		// Counter based on number of total indices inserted
 		int listCounter = 0;
+		// Loop through tree size and add 512 values per level
 		for(int j = 0; j <= levelSize; j++)
 		{
 			for(int i=0; i < 512; i++)
@@ -121,8 +125,11 @@ public class Steganography {
 				writer.format("Split Wavelet[%d][%d] is: %f\n", j,i,splitWavelet[j][i]);
 			}
 		}
+		
 		writer.close();
-		// call the hiding method
+		
+		// TODO: call the hiding method
+		
 		// toByteArray(transformedList);
 		// hideData(transformedList);
 
