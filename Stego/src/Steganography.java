@@ -67,10 +67,11 @@ public class Steganography {
 		// once file is read convert the arraylist into an Array for the wavelet
 		// transform function.
 		double[] waveletInputArray = new double[dataSetFileList.size()];
-		int levelSize = 0, levelCounter =0;
+		int levelSize = 0, levelCounter =0, indexCounter = 0;
 		// loop through the wavelet array and list.
 		for (int j = 0; j < dataSetFileList.size(); j++) {
 			waveletInputArray[j] = dataSetFileList.get(j);
+			
 		}
 		
 		File output = new File(appWorkingFolder + "waveletdata.txt");
@@ -85,7 +86,11 @@ public class Steganography {
 		for (int i = 0; i < transformedList.length; i++) {
 			for (int k = 0; k < transformedList[i].length; k++) {
 				
+				// Iterate number of levels
 				levelCounter++;
+				
+				// Iterate number of indices
+				indexCounter++;
 				if(levelCounter == 512)
 				{
 					levelSize++;
@@ -103,9 +108,17 @@ public class Steganography {
 		{
 			for(int i=0; i < 512; i++)
 			{
-				splitWavelet[j][i] = transformedList[0][listCounter];
-				listCounter++;
-				writer.format("Split Wavelet[%d][%d] is: %f", j,i,splitWavelet[j][i]);
+				
+				if(listCounter == indexCounter-1)
+				{
+					break;
+				}
+				else
+				{
+					splitWavelet[j][i] = transformedList[0][listCounter];
+					listCounter++;
+				}
+				writer.format("Split Wavelet[%d][%d] is: %f\n", j,i,splitWavelet[j][i]);
 			}
 		}
 		writer.close();
