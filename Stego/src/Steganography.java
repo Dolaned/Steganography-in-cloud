@@ -1,4 +1,3 @@
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -63,50 +62,53 @@ public class Steganography {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("null")
 	public void steganography(byte[] key) throws IOException {
 
 		// once file is read convert the arraylist into an Array for the wavelet
 		// transform function.
 		double[] waveletInputArray = new double[dataSetFileList.size()];
-
+		int levelSize = 0, levelCounter =0;
 		// loop through the wavelet array and list.
 		for (int j = 0; j < dataSetFileList.size(); j++) {
 			waveletInputArray[j] = dataSetFileList.get(j);
 		}
+		
 		File output = new File(appWorkingFolder + "waveletdata.txt");
-
+		
 		FileWriter fileWriter = new FileWriter(output);
 		PrintWriter writer = new PrintWriter(fileWriter);
-		double sum = 0;
 		// create the two dimensional wavelet array.
 		double[][] transformedList = Wavelets.transform(4, waveletInputArray);
 		double[] inversedList = Wavelets.inverseTransform(4, transformedList);
 		
-		List<List<Double>> stegoList = new ArrayList<List<Double>>();
-		int firstDimensionCounter = 0;
-		int treeCounter = 0;
-		double stegoTree[][] = null;
-
+		// Loop through transformed list, adjust coefficients and count the level.
 		for (int i = 0; i < transformedList.length; i++) {
 			for (int k = 0; k < transformedList[i].length; k++) {
-
-				// Use for the array list and segmenting
-				if (treeCounter == 512) {
-					treeCounter = 0;
-					firstDimensionCounter++;
+				
+				levelCounter++;
+				if(levelCounter == 512)
+				{
+					levelSize++;
+					levelCounter = 0;
 				}
-				System.out.format("stegoTree[%d][%d] is: %f\n",
-						firstDimensionCounter, treeCounter,
-						stegoTree[firstDimensionCounter][treeCounter]);
+				
 				// adjust coef
 				// transformedList[i][k]+=20;
 				// transformedList[i][k]*=10000;
 			}
 		}
-
-		// Create Tree
-
+		double[][] splitWavelet = new double[levelSize][512];
+		int listCounter = 0;
+		for(int j = 0; j <= levelSize; j++)
+		{
+			for(int i=0; i < 512; i++)
+			{
+				splitWavelet[j][i] = transformedList[0][listCounter];
+				listCounter++;
+				writer.format("Split Wavelet[%d][%d] is: %f", j,i,splitWavelet[j][i]);
+			}
+		}
+		writer.close();
 		// call the hiding method
 		// toByteArray(transformedList);
 		// hideData(transformedList);
