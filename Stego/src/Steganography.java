@@ -138,10 +138,8 @@ public class Steganography {
 
 		writer.close();
 
-		// TODO: call the hiding method
-
-		// toByteArray(transformedList);
-		// hideData(transformedList);
+		// call the hiding method
+		hideData(transformedList);
 
 	}
 
