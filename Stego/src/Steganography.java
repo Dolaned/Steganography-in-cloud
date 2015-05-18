@@ -102,7 +102,7 @@ public class Steganography {
 				}
 			}
 		}
-		minimumValueDouble = Math.abs(Math.ceil(minimumValueDouble));
+		minimumValueDouble = Math.abs(Math.ceil(minimumValueDouble)) +1;
 
 		// TODO: Adjust coefficients
 		for (int i = 0; i < transformedList.length; i++) {
