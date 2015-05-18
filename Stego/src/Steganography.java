@@ -23,8 +23,8 @@ public class Steganography {
 	private File pDataFile;
 	private static ArrayList<Double> dataSetFileList = new ArrayList<Double>();
 	private static Path currentRelativePath = Paths.get("");
-	private static String appWorkingFolder = currentRelativePath.toAbsolutePath()
-			.toString();
+	private static String appWorkingFolder = currentRelativePath
+			.toAbsolutePath().toString();
 	final String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	final int alphLength = alphabet.length();
 
@@ -67,14 +67,16 @@ public class Steganography {
 		// Once file is read convert the arraylist into an Array for the wavelet
 		// transform function.
 		double[] waveletInputArray = new double[dataSetFileList.size()];
-		int levelSize = 0, levelCounter =0, indexCounter = 0;
-		
+		int levelSize = 0, levelCounter = 0, indexCounter = 0;
+		double minimumValueDouble = Double.MAX_VALUE;
+		int minimumValueInt = 0;
+
 		// Loop through the wavelet array and list.
 		for (int j = 0; j < dataSetFileList.size(); j++) {
 			waveletInputArray[j] = dataSetFileList.get(j);
-			
+
 		}
-		
+
 		File output = new File(appWorkingFolder + "waveletdata.txt");
 		FileWriter fileWriter = new FileWriter(output);
 		PrintWriter writer = new PrintWriter(fileWriter);
@@ -82,54 +84,59 @@ public class Steganography {
 		double[][] transformedList = Wavelets.transform(4, waveletInputArray);
 		double[] inversedList = Wavelets.inverseTransform(4, transformedList);
 		
-		// Loop through transformed list, adjust coefficients and count the level.
+		// Loop through transformed list and count the
+		// level.
 		for (int i = 0; i < transformedList.length; i++) {
 			for (int k = 0; k < transformedList[i].length; k++) {
-				
+				if(transformedList[i][k] < minimumValueDouble)
+				{
+					minimumValueDouble = transformedList[i][k];
+				}
 				// Iterate number of levels (512 per level)
 				levelCounter++;
 				// Iterate number of indices (total indices in the tree)
 				indexCounter++;
-				if(levelCounter == 512)
-				{
+				if (levelCounter == 512) {
 					levelSize++;
 					levelCounter = 0;
 				}
+			}
+		}
+		minimumValueDouble = Math.abs(Math.ceil(minimumValueDouble));
+
+		// TODO: Adjust coefficients
+		for (int i = 0; i < transformedList.length; i++) {
+			for (int k = 0; k < transformedList[i].length; k++) {
 				
-				// TODO: Adjust coefficients 
-				
-				// transformedList[i][k]+=20;
-				// transformedList[i][k]*=10000;
+				transformedList[i][k]+=minimumValueDouble;
+				transformedList[i][k]*=10000;
 			}
 		}
 		
-		// Create wavelet to emulate the tree based on level size and values per level
+		// Create wavelet to emulate the tree based on level size and values per
+		// level
 		double[][] splitWavelet = new double[levelSize][512];
 		// Counter based on number of total indices inserted
 		int listCounter = 0;
 		// Loop through tree size and add 512 values per level
-		for(int j = 0; j <= levelSize; j++)
-		{
-			for(int i=0; i < 512; i++)
-			{
-				
-				if(listCounter == indexCounter-1)
-				{
+		for (int j = 0; j <= levelSize; j++) {
+			for (int i = 0; i < 512; i++) {
+
+				if (listCounter == indexCounter - 1) {
 					break;
-				}
-				else
-				{
+				} else {
 					splitWavelet[j][i] = transformedList[0][listCounter];
 					listCounter++;
 				}
-				writer.format("Split Wavelet[%d][%d] is: %f\n", j,i,splitWavelet[j][i]);
+				writer.format("Split Wavelet[%d][%d] is: %f\n", j, i,
+						splitWavelet[j][i]);
 			}
 		}
-		
+
 		writer.close();
-		
+
 		// TODO: call the hiding method
-		
+
 		// toByteArray(transformedList);
 		// hideData(transformedList);
 
@@ -265,7 +272,8 @@ public class Steganography {
 	public File getPrivateDataFile() {
 		return pDataFile;
 	}
-	public static String getAppFolder(){
+
+	public static String getAppFolder() {
 		return appWorkingFolder;
 	}
 }
