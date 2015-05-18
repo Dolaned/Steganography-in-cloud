@@ -27,7 +27,10 @@ public class Steganography {
 			.toAbsolutePath().toString();
 	final String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	final int alphLength = alphabet.length();
-
+	private double minimumValueDouble;
+	private List<Integer> matrixKeyRow = new ArrayList<Integer>();
+   private List<Integer> matrixKeyCol = new ArrayList<Integer>();
+	
 	public boolean encrypt(File file) {
 		try {
 			int i = 0;
@@ -68,7 +71,7 @@ public class Steganography {
 		// transform function.
 		double[] waveletInputArray = new double[dataSetFileList.size()];
 		int levelSize = 0, levelCounter = 0, indexCounter = 0;
-		double minimumValueDouble = Double.MAX_VALUE;
+		minimumValueDouble = Double.MAX_VALUE;
 		int minimumValueInt = 0;
 
 		// Loop through the wavelet array and list.
@@ -180,8 +183,18 @@ public class Steganography {
 		}
 		return bytes;
 	}
+	
+	public static byte[] toByteArray(double value) {
+      byte[] bytes = new byte[8];
+      ByteBuffer.wrap(bytes).putDouble(value);
+      return bytes;
+  }
 
-	public boolean hideData(double[][] tList) throws IOException {
+  public static double toDouble(byte[] bytes) {
+      return ByteBuffer.wrap(bytes).getDouble();
+  }
+
+	public double[][] hideData(double[][] tList) throws IOException {
 		int s = 1;
 		char[] key = new char[tList.length];
 		Random r = new Random();
@@ -223,20 +236,43 @@ public class Steganography {
 		}
 		// row[] and col[] as the position matrix for the hiding position
 
-		// write matrix to file
-		for (int i = 0; i < col.length; i++)
-			pw.print(col[i]);
+		count = 0;
+      // start hiding
+      for(int i = 0; i < row.length; i++) {
+         for(int j = 0; j < col.length; j++) {
+            if(count < cipher.length) {
+               // hide data
+               // convert wavelet to binary
+               byte[] tmp = toByteArray(tList[row[i]][col[j]]);
+               
+               // concatenate cipher 8 bits into wavelet
+               byte[] newValue = new byte[tmp.length + 1];
+               System.arraycopy(tmp, 0, newValue, 0, tmp.length);
+               newValue[tmp.length] = cipher[count];
+               count++;
+               
+               // convert back to double
+               tList[row[i]][col[j]] = toDouble(newValue);
+               
+               // store the matrixKey
+               matrixKeyRow.add(i);
+               matrixKeyCol.add(j);
+               pw.print(i + "," + j);
+            }
+         }
+      }
 
-		pw.println();
-		for (int i = 0; i < row.length; i++)
-			pw.print(row[i]);
-		pw.close();
+      pw.close();
+      
+      // Adjust coefficients back
+      for (int i = 0; i < tList.length; i++) {
+         for (int j = 0; j < tList[i].length; j++) { 
+            tList[i][j] = tList[i][j] / 10000;
+            tList[i][j] = tList[i][j] - minimumValueDouble;
+         }
+      }
 
-		while (s < tList.length) {
-
-		}
-
-		return true;
+		return tList;
 	}
 
 	public boolean readFileContents(File data) throws IOException {
