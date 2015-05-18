@@ -149,9 +149,9 @@ public class Main {
 		steg.setPrivateFile(privateDataFile);
 
 		// call secret data encryption method.
-		// if(steg.encrypt(privateDataFile)){
-		steg.stegStart(steg.getFolderPath(), steg.getPrivateDataFile());
-		// }
+		if(steg.encrypt(privateDataFile)){
+		   steg.stegStart(steg.getFolderPath(), steg.getPrivateDataFile());
+		}
 
 		// if(aHandler.pushToCloud(bucketName, keyName, null)){
 		// System.out.println("File Uploaded");

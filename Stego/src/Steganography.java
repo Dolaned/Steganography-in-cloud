@@ -137,9 +137,9 @@ public class Steganography {
 		}
 
 		writer.close();
-
+		
 		// call the hiding method
-		hideData(transformedList);
+		hideData(splitWavelet);
 
 	}
 
@@ -193,7 +193,6 @@ public class Steganography {
   }
 
 	public double[][] hideData(double[][] tList) throws IOException {
-		int s = 1;
 		char[] key = new char[tList.length];
 		Random r = new Random();
 		pw = new PrintWriter(new BufferedWriter(new FileWriter(appWorkingFolder
@@ -233,7 +232,7 @@ public class Steganography {
 			}
 		}
 		// row[] and col[] as the position matrix for the hiding position
-
+		
 		count = 0;
       // start hiding
       for(int i = 0; i < row.length; i++) {
