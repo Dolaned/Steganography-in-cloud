@@ -80,7 +80,7 @@ public class Steganography {
 					: '1');
 		return sb.toString();
 	}
-	public double[][] createHiddenWavelet(double [][] tree)
+	public double[][] createHiddenWavelet(double [][] tree, int indices)
 	{
 		double [][] hiddenWavelet = this.transformedListGlobal;
 		int hiddenCounter = 0;
@@ -88,8 +88,15 @@ public class Steganography {
 		{
 			for(int j=0; j < tree[0].length; j++)
 			{
-				hiddenWavelet[0][hiddenCounter] = tree[i][j];
-				hiddenCounter++;
+				if (hiddenCounter == indices - 1) {
+					break;
+				} 
+				else 
+				{
+					hiddenWavelet[0][hiddenCounter] = tree[i][j];
+					hiddenCounter++;
+				}
+				
 			}
 		}
 		
@@ -132,8 +139,8 @@ public class Steganography {
 
 		}
 
-		File output = new File(appWorkingFolder + "waveletdata.txt");
-		FileWriter fileWriter = new FileWriter(output);
+		File stegoReadings = new File(appWorkingFolder + "/stegodata.txt");
+		FileWriter fileWriter = new FileWriter(stegoReadings);
 		PrintWriter writer = new PrintWriter(fileWriter);
 		// Create the two dimensional wavelet array.
 		double[][] transformedList = Wavelets.transform(4, waveletInputArray);
@@ -171,10 +178,15 @@ public class Steganography {
 
 		// call the hiding method
 		double[][] tree = splitWavelet(levelSize, indexCounter, transformedList);
-		double[][] hiddenWavelet = createHiddenWavelet(hideData(tree));
+		double[][] hiddenWavelet = createHiddenWavelet(hideData(tree), indexCounter);
 		double[] inverseList = Wavelets.inverseTransform(4, hiddenWavelet);
 		
+		for(int i=0; i < inverseList.length; i++)
+		{
+			writer.println(inverseList[i]);
+		}
 		
+		writer.close();
 	}
 
 	// loop all files in folder and apply wavelets
