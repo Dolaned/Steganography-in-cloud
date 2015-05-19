@@ -18,6 +18,7 @@ import org.mathIT.approximation.Wavelets;
 
 public class Steganography {
 	private static byte[] cipher;
+	private byte[] secretkey;
 	private PrintWriter pw;
 	private File folderPath;
 	private File pDataFile;
@@ -38,7 +39,7 @@ public class Steganography {
 					appWorkingFolder + "secretkey.txt")));
 			byte[] fileData = Files.readAllBytes(file.toPath());
 
-			byte[] secretkey = new byte[fileData.length];
+			secretkey = new byte[fileData.length];
 			new Random().nextBytes(secretkey);
 
 			pw.write(toBinaryString(secretkey));
@@ -56,6 +57,20 @@ public class Steganography {
 		}
 		return false;
 	}
+	
+	public String decrypt(byte[] cipherPInfo)
+	{
+	   byte[] bytePInfo = new byte[secretkey.length];;
+	   int i = 0;
+	   
+	   for(byte b : cipherPInfo)
+	   {
+	      bytePInfo[i] = (byte) (b ^ secretkey[i]);
+	      i++;
+	   }
+	   
+	   return (new String(bytePInfo));
+	}
 
 	public static String toBinaryString(byte[] bytes) {
 		StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
@@ -72,7 +87,6 @@ public class Steganography {
 		double[] waveletInputArray = new double[dataSetFileList.size()];
 		int levelSize = 0, levelCounter = 0, indexCounter = 0;
 		minimumValueDouble = Double.MAX_VALUE;
-		int minimumValueInt = 0;
 
 		// Loop through the wavelet array and list.
 		for (int j = 0; j < dataSetFileList.size(); j++) {
@@ -85,7 +99,7 @@ public class Steganography {
 		PrintWriter writer = new PrintWriter(fileWriter);
 		// Create the two dimensional wavelet array.
 		double[][] transformedList = Wavelets.transform(4, waveletInputArray);
-		double[] inversedList = Wavelets.inverseTransform(4, transformedList);
+		//double[] inversedList = Wavelets.inverseTransform(4, transformedList);
 		
 		// Loop through transformed list and count the
 		// level.
@@ -269,6 +283,8 @@ public class Steganography {
          }
       }
 
+      //TODO reverse the levels and inverse the wavelet
+      
 		return tList;
 	}
 
