@@ -31,6 +31,7 @@ public class Steganography {
 	private double minimumValueDouble;
 	private List<Integer> matrixKeyRow = new ArrayList<Integer>();
    private List<Integer> matrixKeyCol = new ArrayList<Integer>();
+   private double[][] tList;
 	
 	public boolean encrypt(File file) {
 		try {
@@ -268,7 +269,7 @@ public class Steganography {
                // store the matrixKey
                matrixKeyRow.add(i);
                matrixKeyCol.add(j);
-               pw.print(i + "," + j);
+               pw.print(i + "," + j + "\n");
             }
          }
       }
@@ -283,9 +284,45 @@ public class Steganography {
          }
       }
 
+      this.tList = tList;
       //TODO reverse the levels and inverse the wavelet
       
 		return tList;
+	}
+	
+	public void extract() throws IOException
+	{
+	   byte[] cipherPInfo = new byte[cipher.length];
+	   int count = 0;
+	
+	   //TODO make a function to do wavelet
+	   double[][] tList = this.tList;
+	   
+	   // start extraction
+	   for(int i = 0; i < matrixKeyRow.size(); i++) {
+         for(int j = 0; j < matrixKeyCol.size(); j++) {
+            // extract data
+            // convert wavelet to binary
+            byte[] tmp = toByteArray(tList[matrixKeyRow.get(i)][matrixKeyCol.get(j)]);
+            
+            // extract cipher 8 bits from wavelet
+            cipherPInfo[count] = tmp[tmp.length-1];
+            count++;
+            
+            byte[] newValue = Arrays.copyOfRange(tmp, 0, tmp.length-2);
+            
+            // convert back to double
+            tList[matrixKeyRow.get(i)][matrixKeyCol.get(j)] = toDouble(newValue);
+         }
+	   }
+	   
+	   //TODO reverse the levels and inverse the wavelet
+	   
+	   // decrypt private info and write to file
+	   pw = new PrintWriter(new BufferedWriter(new FileWriter(appWorkingFolder 
+	                                                          + "privateInfo.txt")));
+	   pw.print(decrypt(cipherPInfo));
+	   pw.close();
 	}
 
 	public boolean readFileContents(File data) throws IOException {
