@@ -130,6 +130,7 @@ public class Steganography {
 		// Once file is read convert the arraylist into an Array for the wavelet
 		// transform function.
 		double[] waveletInputArray = new double[dataSetFileList.size()];
+		int padding_cutoff = waveletInputArray.length;
 		int levelSize = 0, levelCounter = 0, indexCounter = 0;
 		minimumValueDouble = Double.MAX_VALUE;
 
@@ -166,24 +167,28 @@ public class Steganography {
 			}
 		}
 		minimumValueDouble = Math.abs(Math.ceil(minimumValueDouble)) + 1;
-
 		// TODO: Adjust coefficients
-		for (int i = 0; i < transformedList.length; i++) {
-			for (int k = 0; k < transformedList[i].length; k++) {
+		for (int k = 0; k < transformedList[0].length; k++) {
 
-				transformedList[i][k] += minimumValueDouble;
-				transformedList[i][k] *= 10000;
-			}
+			transformedList[0][k] += minimumValueDouble;
+			transformedList[0][k] *= 10000;
 		}
-
+		// TODO: Convert doubles to integers before hiding
+		
 		// call the hiding method
 		double[][] tree = splitWavelet(levelSize, indexCounter, transformedList);
 		double[][] hiddenWavelet = createHiddenWavelet(hideData(tree), indexCounter);
 		double[] inverseList = Wavelets.inverseTransform(4, hiddenWavelet);
+		double[] inverseListNoPadding = new double[padding_cutoff];
 		
-		for(int i=0; i < inverseList.length; i++)
+		// Trim the Inversed Wavelet to match the original file
+		for(int i=0; i < padding_cutoff; i++)
 		{
-			writer.println(inverseList[i]);
+			inverseListNoPadding[i] = inverseList[i];
+		}
+		for(int i=0; i < inverseListNoPadding.length; i++)
+		{
+			writer.println(inverseListNoPadding[i]);
 		}
 		
 		writer.close();
@@ -281,7 +286,7 @@ public class Steganography {
 
 		count = 0;
 		// start hiding
-		for (int i = 0; i < row.length; i++) {
+		/*for (int i = 0; i < row.length; i++) {
 			for (int j = 0; j < col.length; j++) {
 				if (count < cipher.length) {
 					// hide data
@@ -306,10 +311,10 @@ public class Steganography {
 		}
 
 		pw.close();
-
+		*/
 		// Adjust coefficients back
 		for (int i = 0; i < tList.length; i++) {
-			for (int j = 0; j < tList[i].length; j++) {
+			for (int j = 0; j < tList[0].length; j++) {
 				tList[i][j] = tList[i][j] / 10000;
 				tList[i][j] = tList[i][j] - minimumValueDouble;
 			}
