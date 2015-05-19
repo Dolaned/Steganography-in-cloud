@@ -30,9 +30,9 @@ public class Steganography {
 	final int alphLength = alphabet.length();
 	private double minimumValueDouble;
 	private List<Integer> matrixKeyRow = new ArrayList<Integer>();
-   private List<Integer> matrixKeyCol = new ArrayList<Integer>();
-   private double[][] tList;
-	
+	private List<Integer> matrixKeyCol = new ArrayList<Integer>();
+	private double[][] tList;
+
 	public boolean encrypt(File file) {
 		try {
 			int i = 0;
@@ -58,19 +58,18 @@ public class Steganography {
 		}
 		return false;
 	}
-	
-	public String decrypt(byte[] cipherPInfo)
-	{
-	   byte[] bytePInfo = new byte[secretkey.length];;
-	   int i = 0;
-	   
-	   for(byte b : cipherPInfo)
-	   {
-	      bytePInfo[i] = (byte) (b ^ secretkey[i]);
-	      i++;
-	   }
-	   
-	   return (new String(bytePInfo));
+
+	public String decrypt(byte[] cipherPInfo) {
+		byte[] bytePInfo = new byte[secretkey.length];
+		;
+		int i = 0;
+
+		for (byte b : cipherPInfo) {
+			bytePInfo[i] = (byte) (b ^ secretkey[i]);
+			i++;
+		}
+
+		return (new String(bytePInfo));
 	}
 
 	public static String toBinaryString(byte[] bytes) {
@@ -79,6 +78,29 @@ public class Steganography {
 			sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0'
 					: '1');
 		return sb.toString();
+	}
+
+	public double[][] splitWavelet(int levelSize, int indices, double[][] list) {
+		
+		// Create wavelet to emulate the tree based on level size and values per
+		// level
+		double[][] splitWavelet = new double[levelSize][512];
+		// Counter based on number of total indices inserted
+		int listCounter = 0;
+		// Loop through tree size and add 512 values per level
+		for (int j = 0; j <= levelSize; j++) {
+			for (int i = 0; i < 512; i++) {
+
+				if (listCounter == indices - 1) {
+					break;
+				} else {
+					splitWavelet[j][i] = list[0][listCounter];
+					listCounter++;
+				}
+			}
+		}
+
+		return splitWavelet;
 	}
 
 	public void steganography(byte[] key) throws IOException {
@@ -100,14 +122,14 @@ public class Steganography {
 		PrintWriter writer = new PrintWriter(fileWriter);
 		// Create the two dimensional wavelet array.
 		double[][] transformedList = Wavelets.transform(4, waveletInputArray);
-		//double[] inversedList = Wavelets.inverseTransform(4, transformedList);
-		
+		// double[] inversedList = Wavelets.inverseTransform(4,
+		// transformedList);
+
 		// Loop through transformed list and count the
 		// level.
 		for (int i = 0; i < transformedList.length; i++) {
 			for (int k = 0; k < transformedList[i].length; k++) {
-				if(transformedList[i][k] < minimumValueDouble)
-				{
+				if (transformedList[i][k] < minimumValueDouble) {
 					minimumValueDouble = transformedList[i][k];
 				}
 				// Iterate number of levels (512 per level)
@@ -120,41 +142,21 @@ public class Steganography {
 				}
 			}
 		}
-		minimumValueDouble = Math.abs(Math.ceil(minimumValueDouble)) +1;
+		minimumValueDouble = Math.abs(Math.ceil(minimumValueDouble)) + 1;
 
 		// TODO: Adjust coefficients
 		for (int i = 0; i < transformedList.length; i++) {
 			for (int k = 0; k < transformedList[i].length; k++) {
-				
-				transformedList[i][k]+=minimumValueDouble;
-				transformedList[i][k]*=10000;
-			}
-		}
-		
-		// Create wavelet to emulate the tree based on level size and values per
-		// level
-		double[][] splitWavelet = new double[levelSize][512];
-		// Counter based on number of total indices inserted
-		int listCounter = 0;
-		// Loop through tree size and add 512 values per level
-		for (int j = 0; j <= levelSize; j++) {
-			for (int i = 0; i < 512; i++) {
 
-				if (listCounter == indexCounter - 1) {
-					break;
-				} else {
-					splitWavelet[j][i] = transformedList[0][listCounter];
-					listCounter++;
-				}
-				writer.format("Split Wavelet[%d][%d] is: %f\n", j, i,
-						splitWavelet[j][i]);
+				transformedList[i][k] += minimumValueDouble;
+				transformedList[i][k] *= 10000;
 			}
 		}
 
-		writer.close();
-		
 		// call the hiding method
-		hideData(splitWavelet);
+		double[][] tree = splitWavelet(levelSize, indexCounter, transformedList);
+		double[][] hiddenTree = hideData(tree);
+		
 
 	}
 
@@ -196,16 +198,16 @@ public class Steganography {
 		}
 		return bytes;
 	}
-	
-	public static byte[] toByteArray(double value) {
-      byte[] bytes = new byte[8];
-      ByteBuffer.wrap(bytes).putDouble(value);
-      return bytes;
-  }
 
-  public static double toDouble(byte[] bytes) {
-      return ByteBuffer.wrap(bytes).getDouble();
-  }
+	public static byte[] toByteArray(double value) {
+		byte[] bytes = new byte[8];
+		ByteBuffer.wrap(bytes).putDouble(value);
+		return bytes;
+	}
+
+	public static double toDouble(byte[] bytes) {
+		return ByteBuffer.wrap(bytes).getDouble();
+	}
 
 	public double[][] hideData(double[][] tList) throws IOException {
 		char[] key = new char[tList.length];
@@ -247,82 +249,82 @@ public class Steganography {
 			}
 		}
 		// row[] and col[] as the position matrix for the hiding position
-		
+
 		count = 0;
-      // start hiding
-      for(int i = 0; i < row.length; i++) {
-         for(int j = 0; j < col.length; j++) {
-            if(count < cipher.length) {
-               // hide data
-               // convert wavelet to binary
-               byte[] tmp = toByteArray(tList[row[i]][col[j]]);
-               
-               // concatenate cipher 8 bits into wavelet
-               byte[] newValue = new byte[tmp.length + 1];
-               System.arraycopy(tmp, 0, newValue, 0, tmp.length);
-               newValue[tmp.length] = cipher[count];
-               count++;
-               
-               // convert back to double
-               tList[row[i]][col[j]] = toDouble(newValue);
-               
-               // store the matrixKey
-               matrixKeyRow.add(i);
-               matrixKeyCol.add(j);
-               pw.print(i + "," + j + "\n");
-            }
-         }
-      }
+		// start hiding
+		for (int i = 0; i < row.length; i++) {
+			for (int j = 0; j < col.length; j++) {
+				if (count < cipher.length) {
+					// hide data
+					// convert wavelet to binary
+					byte[] tmp = toByteArray(tList[row[i]][col[j]]);
 
-      pw.close();
-      
-      // Adjust coefficients back
-      for (int i = 0; i < tList.length; i++) {
-         for (int j = 0; j < tList[i].length; j++) { 
-            tList[i][j] = tList[i][j] / 10000;
-            tList[i][j] = tList[i][j] - minimumValueDouble;
-         }
-      }
+					// concatenate cipher 8 bits into wavelet
+					byte[] newValue = new byte[tmp.length + 1];
+					System.arraycopy(tmp, 0, newValue, 0, tmp.length);
+					newValue[tmp.length] = cipher[count];
+					count++;
 
-      this.tList = tList;
-      //TODO reverse the levels and inverse the wavelet
-      
+					// convert back to double
+					tList[row[i]][col[j]] = toDouble(newValue);
+
+					// store the matrixKey
+					matrixKeyRow.add(i);
+					matrixKeyCol.add(j);
+					pw.print(i + "," + j + "\n");
+				}
+			}
+		}
+
+		pw.close();
+
+		// Adjust coefficients back
+		for (int i = 0; i < tList.length; i++) {
+			for (int j = 0; j < tList[i].length; j++) {
+				tList[i][j] = tList[i][j] / 10000;
+				tList[i][j] = tList[i][j] - minimumValueDouble;
+			}
+		}
+
+		this.tList = tList;
+		// TODO reverse the levels and inverse the wavelet
+
 		return tList;
 	}
-	
-	public void extract() throws IOException
-	{
-	   byte[] cipherPInfo = new byte[cipher.length];
-	   int count = 0;
-	
-	   //TODO make a function to do wavelet
-	   double[][] tList = this.tList;
-	   
-	   // start extraction
-	   for(int i = 0; i < matrixKeyRow.size(); i++) {
-         for(int j = 0; j < matrixKeyCol.size(); j++) {
-            // extract data
-            // convert wavelet to binary
-            byte[] tmp = toByteArray(tList[matrixKeyRow.get(i)][matrixKeyCol.get(j)]);
-            
-            // extract cipher 8 bits from wavelet
-            cipherPInfo[count] = tmp[tmp.length-1];
-            count++;
-            
-            byte[] newValue = Arrays.copyOfRange(tmp, 0, tmp.length-2);
-            
-            // convert back to double
-            tList[matrixKeyRow.get(i)][matrixKeyCol.get(j)] = toDouble(newValue);
-         }
-	   }
-	   
-	   //TODO reverse the levels and inverse the wavelet
-	   
-	   // decrypt private info and write to file
-	   pw = new PrintWriter(new BufferedWriter(new FileWriter(appWorkingFolder 
-	                                                          + "privateInfo.txt")));
-	   pw.print(decrypt(cipherPInfo));
-	   pw.close();
+
+	public void extract() throws IOException {
+		byte[] cipherPInfo = new byte[cipher.length];
+		int count = 0;
+
+		// TODO make a function to do wavelet
+		double[][] tList = this.tList;
+
+		// start extraction
+		for (int i = 0; i < matrixKeyRow.size(); i++) {
+			for (int j = 0; j < matrixKeyCol.size(); j++) {
+				// extract data
+				// convert wavelet to binary
+				byte[] tmp = toByteArray(tList[matrixKeyRow.get(i)][matrixKeyCol
+						.get(j)]);
+
+				// extract cipher 8 bits from wavelet
+				cipherPInfo[count] = tmp[tmp.length - 1];
+				count++;
+
+				byte[] newValue = Arrays.copyOfRange(tmp, 0, tmp.length - 2);
+
+				// convert back to double
+				tList[matrixKeyRow.get(i)][matrixKeyCol.get(j)] = toDouble(newValue);
+			}
+		}
+
+		// TODO reverse the levels and inverse the wavelet
+
+		// decrypt private info and write to file
+		pw = new PrintWriter(new BufferedWriter(new FileWriter(appWorkingFolder
+				+ "privateInfo.txt")));
+		pw.print(decrypt(cipherPInfo));
+		pw.close();
 	}
 
 	public boolean readFileContents(File data) throws IOException {
