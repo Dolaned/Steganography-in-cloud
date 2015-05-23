@@ -172,6 +172,7 @@ public class Steganography {
 
 			transformedList[0][k] += minimumValueDouble;
 			transformedList[0][k] *= 10000;
+			transformedList[0][k] = (int)transformedList[0][k];
 		}
 		// TODO: Convert doubles to integers before hiding
 		
@@ -286,7 +287,7 @@ public class Steganography {
 
 		count = 0;
 		// start hiding
-		/*for (int i = 0; i < row.length; i++) {
+		for (int i = 0; i < row.length; i++) {
 			for (int j = 0; j < col.length; j++) {
 				if (count < cipher.length) {
 					// hide data
@@ -311,7 +312,7 @@ public class Steganography {
 		}
 
 		pw.close();
-		*/
+		
 		// Adjust coefficients back
 		for (int i = 0; i < tList.length; i++) {
 			for (int j = 0; j < tList[0].length; j++) {
