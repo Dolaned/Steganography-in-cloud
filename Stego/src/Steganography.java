@@ -145,6 +145,7 @@ public class Steganography {
 		PrintWriter writer = new PrintWriter(fileWriter);
 		// Create the two dimensional wavelet array.
 		double[][] transformedList = Wavelets.transform(4, waveletInputArray);
+		
 		this.transformedListGlobal = transformedList;
 		// double[] inversedList = Wavelets.inverseTransform(4,
 		// transformedList);
@@ -166,15 +167,17 @@ public class Steganography {
 				}
 			}
 		}
+		int[][] intTransformedList = new int[2][indexCounter];
 		minimumValueDouble = Math.abs(Math.ceil(minimumValueDouble)) + 1;
 		// TODO: Adjust coefficients
 		for (int k = 0; k < transformedList[0].length; k++) {
 
 			transformedList[0][k] += minimumValueDouble;
 			transformedList[0][k] *= 10000;
-			transformedList[0][k] = (int)transformedList[0][k];
+			
+			// Convert to int
+			intTransformedList[0][k] = (int)transformedList[0][k];
 		}
-		// TODO: Convert doubles to integers before hiding
 		
 		// call the hiding method
 		double[][] tree = splitWavelet(levelSize, indexCounter, transformedList);
