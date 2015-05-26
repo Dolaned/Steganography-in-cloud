@@ -1,15 +1,18 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-	private static String bucketName = "stegan";
-	private static String keyName = "*** Provide key ***";
 	public static AmazonHandler aHandler = new AmazonHandler();
 	public static Steganography steg = new Steganography();
 	public static Scanner sc = new Scanner(System.in);
+	private static Path currentRelativePath = Paths.get("");
+	private static String appWorkingFolder = currentRelativePath
+			.toAbsolutePath().toString();
 
 	public static void main(String args[]) throws IOException {
 
@@ -44,6 +47,9 @@ public class Main {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					break;
+				case "4":
+					File[] f = {new File(appWorkingFolder+"/ ")};
 					break;
 				default:
 					System.out.println("Enter Valid Input!");
@@ -178,5 +184,9 @@ public class Main {
 		System.out.println("X. Exit");
 		System.out.println("\n");
 		System.out.println("Please Enter An Option: ");
+	}
+	
+	public String getAppWorkingDir(){
+		return appWorkingFolder;
 	}
 }
