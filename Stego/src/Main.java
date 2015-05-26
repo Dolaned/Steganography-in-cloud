@@ -11,7 +11,7 @@ public class Main {
 	public static Steganography steg = new Steganography();
 	public static Scanner sc = new Scanner(System.in);
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws IOException {
 
 		// scanner for menu input
 
@@ -159,8 +159,8 @@ public class Main {
 
 	}
 
-	private static boolean pullFromCloud() {
-
+	private static boolean pullFromCloud() throws IOException {
+	   steg.extract();
 		return true;
 
 	}
